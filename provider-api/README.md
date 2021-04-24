@@ -44,6 +44,6 @@ Response:
 }
 ```
 # Glossary
-Connector: Integration details to a Provider.
-Provider: AI service provider.
-AI Service: Service / Feature offered by a Provider.
+* Connector: Integration details to a Provider.
+* Provider: AI service provider.
+* AI Service: Service / Feature offered by a Provider.

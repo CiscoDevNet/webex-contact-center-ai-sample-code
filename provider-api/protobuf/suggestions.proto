@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package com.cisco.wcc.ccai;
+import  "recognize.proto";
+
+message AgentAnswerResult {
+  oneof answer_oneof {
+    Status error = 1 ;
+    AgentAnswer agentanswer = 2;
+  }
+}
+
+message AgentAnswer {
+  repeated Answer answers = 1;
+  repeated string tags = 2;
+}
+
+
+/*
+  The message Answer is cummulative response of FaqAnswer and ArticleAnswer
+*/
+message Answer {
+  // ArticleAnswer Fields
+  string title = 1;
+  string uri = 2;
+  repeated string snippets = 3;
+  // Faq Answer Fields
+  string description = 4;
+  float confidence = 5;
+  //string question = 6;
+  string source = 6;
+  // Common Fields
+  map <string, string> metadata = 7;
+  string answer_record = 8;
+  // string highlight = 10;
+  repeated range highlight = 9;
+}
+
+message range {
+  int32 start = 1;
+  int32 end = 2;
+}

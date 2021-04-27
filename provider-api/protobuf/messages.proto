@@ -3,7 +3,7 @@ syntax = "proto3";
 package com.cisco.wcc.ccai;
 
 enum NullValue{
-  null = 0;
+  NULL = 0;
 }
 message Struct{
   map<string, Value> fields=1;

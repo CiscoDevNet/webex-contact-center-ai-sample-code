@@ -94,7 +94,7 @@ enum Dtmf {
 }
 
 
-// Virtual Agent Request Object
+// Agent Assist Request Object
 message StreamingAnalyzeAAContentRequest {
   oneof InputData {
     bytes audio = 1;
@@ -104,7 +104,7 @@ message StreamingAnalyzeAAContentRequest {
   // InputAudio Recognition Config
   RecognitionConfig inputAudioConfig = 3;
 
-  // Default = True for Virtual Assistant
+  // Default = True
   bool interim_results = 4;
 
   // Default = False

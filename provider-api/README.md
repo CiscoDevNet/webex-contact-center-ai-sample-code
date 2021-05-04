@@ -12,6 +12,12 @@ b.	Agent Assist (AA): This is the persona where Caller / Agent Audio streams are
 6.	External AI Connector receives the media and translate it into the desired External AI Service format and route it to the request.
 7.	The responses received from External AI Services are returned back to Orchestrator by the External AI Connector.
 
+## Virtual Agent Callflow
+![VA](https://user-images.githubusercontent.com/5176062/116988874-a37cef80-acee-11eb-9123-bd7fa37373f0.jpg)
+
+## Agent Assist Callflow
+![AA](https://user-images.githubusercontent.com/5176062/116988897-ab3c9400-acee-11eb-8dd0-5bfe932a4acf.jpg)
+
 # Onboarding
 Webex Contact Center Control Hub to be used by the customer to create a configuration. 
 1.	A Connector will need to be created for each provider which includes the Provider endpoint, its services and Auth token.

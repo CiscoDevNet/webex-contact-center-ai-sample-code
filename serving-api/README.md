@@ -6,5 +6,5 @@ CCAI Serving API interface is the serving layer to fetch the insights of the cal
 
 CCAI Serving API Service runs a gRPC Server which can be connected from a thick Client by implementing gRPC client or by Browser directly by connecting using grpc-web protocol.
 
-- Serving API gRPC Endpoint: https://serving-api-streaming.wxcc-us1.cisco.com/serving-api-streaming/v1/
+- Serving API gRPC Endpoint: serving-api-streaming.wxcc-us1.cisco.com:443
 - Serving API HTTP Ping Endpoint: https://serving-api-streaming.wxcc-us1.cisco.com/serving-api-streaming/v1/ping

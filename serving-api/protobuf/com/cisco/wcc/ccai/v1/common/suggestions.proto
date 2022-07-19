@@ -1,0 +1,52 @@
+/*
+ Proto file with messages related to Agent Answers
+ */
+syntax = "proto3";
+
+package com.cisco.wcc.ccai.v1;
+
+/*
+ Represents the AgentAnswerResult object with agent answer information
+*/
+message AgentAnswerResult {
+  oneof answer_oneof {
+    AgentAnswer agentanswer = 2; //Agent Answers
+  }
+}
+
+/*
+ Represents the AgentAnswer object with answers and tags
+*/
+message AgentAnswer {
+  repeated Answer answers = 1; //List of answers
+  repeated string tags = 2; //List of tags
+}
+
+
+/*
+  Represents Answer which is cumulative response of FaqAnswer and ArticleAnswer
+*/
+message Answer {
+
+  string title = 1; // ArticleAnswer Field - title
+  string uri = 2; // ArticleAnswer Field - uri
+  repeated string snippets = 3; // ArticleAnswer Field - snippets
+
+  string description = 4; // Faq Answer Field - description
+  float confidence = 5; // Faq Answer Field - confidence
+
+  string source = 6; // Faq Answer Field - source
+
+  map <string, string> metadata = 7; // Common Field - metadata
+  string answer_record = 8; // Common Field - answer record
+
+  repeated range highlight = 9; // Common Fields - highlight
+}
+
+/*
+ Represents the range object with start and end integer values
+*/
+message range {
+  int32 start = 1; //start
+  int32 end = 2; //end
+}

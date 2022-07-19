@@ -1,0 +1,164 @@
+/*
+ This proto file contains the Serving API
+ Service streaming gRPC calls for retrieving the streaming insights based on the conversation id
+*/
+syntax = "proto3";
+option java_multiple_files = true;
+
+package com.cisco.wcc.ccai.v1;
+
+import "com/cisco/wcc/ccai/v1/common/suggestions.proto";
+import "com/cisco/wcc/ccai/v1/common/recognize.proto";
+
+
+/*
+ Service to subscribe to, to get AI Insights
+*/
+service AiInsight {
+
+    /*
+     Server side Streaming gRPC Call that produces streaming insights
+     for a given conversation ID
+    */
+    rpc StreamingInsightServing(StreamingInsightServingRequest)
+    returns (stream StreamingInsightServingResponse) {}
+}
+
+/*
+ Represents the request for retrieving insights for a given conversation ID
+*/
+message StreamingInsightServingRequest{
+    InsightServingRequest insightServingRequest = 1; // Insight serving request
+}
+
+/*
+ Represents the request content for retrieving AI Insights
+*/
+message InsightServingRequest{
+
+    /*
+        Required. Conversation ID for which insights are needed.
+        The subscription will start listening to any insights for this conversation
+        across multiple legs( IVR, Caller, Agent) and services (Transcription, Agent Assist)
+    */
+    string conversationId = 1;
+
+    /*
+        Required.Control Hub OrgID for the org, this conversation belongs to.
+        The Access token should have authorization for this Org.
+    */
+    string orgId = 2;
+
+    bool realTimeTranscripts = 3; // Is real time transcripts required? Default: false
+    bool historicalTranscripts = 4; // Is historical transcripts from start of the conversation required? Default: false
+    bool realtimeAgentAssist = 5; // Is real time agent assist required? Default: False
+    bool historicalAgentAssist = 6; // Is historical agent assist from start of the conversation required? Default: false
+
+}
+
+/*
+ Response returned with Insights. There would be multiple messages in the stream.
+ Each service type may have zero or more messages
+*/
+message StreamingInsightServingResponse{
+    InsightServingResponse insightServingResponse = 1; // Insight serving response
+}
+
+
+/*
+ Represents the insight serving response
+*/
+message InsightServingResponse{
+
+    //Org Identifier (control hub) for which the insights need to be delivered
+    string orgId = 1;
+
+    //Identifier for the Conversation. Equivalent to Call ID, CallGUID etc.
+    string conversationId = 2;
+
+    //Identifier for the individual leg, based on the party. GUID
+    string roleId = 3;
+
+    /**
+    * Identifier for a given utterance. The same utterance ID will be published
+    * for the transcript utterance and the insights generated from it
+    */
+    string utteranceId=4;
+
+    //Identifier for the party.
+    enum Role {
+        IVR=0; // Role - IVR
+        CALLER=1; // Role - Caller
+        AGENT=2; // Role - Agent
+    }
+
+    //Role specifying IVR, Caller or Agent
+    Role role = 5;
+
+    // Type of service this Insight belongs to
+    enum ServiceType {
+        DEFAULT_TRANSCRIPTION =  0; // Service type - Default
+        AGENT_ANSWERS       =   1; // Service type - Agent answers
+        TRANSCRIPTION         =   2; // Service type - Transcription
+    }
+
+    // Type of insight : ASR, Agent Assist etc.
+    ServiceType insightType = 6;
+
+    // Provider List for Services
+    enum ServiceProvider {
+        DEFAULT         =  0; // Service provider - Default
+        GOOGLE          =  1; // Service provider - Google
+    }
+
+    //Service Provider who produced this insight.
+    ServiceProvider insightProvider = 7;
+
+    /*
+     Epoch Timestamp when this insight record was created/published.
+     This field is always available, can be used for sorting messages by time.
+    */
+    int64 publishTimestamp = 8;
+
+    /*
+     Start time corresponds to the start time
+     to which this insight belongs. Epoch Timestamp.
+     These are optional fields, not always available
+    */
+    int64 startTimestamp = 9;
+
+    /*
+     End time corresponds to the speech end time
+     to which this insight belongs. Epoch Timestamp.
+     These are optional fields, not always available
+    */
+    int64 endTimestamp = 10;
+
+    /*
+     Whether the insight is final or intermediate. Intermediate results will be
+     overridden by the final result that follows them.
+    */
+    bool isFinal = 11;
+
+    //Content of the insight. This will vary based on the type of insight
+    ResponseContent responseContent = 12;
+
+    //message id
+    string messageId=13;
+}
+
+/*
+ Represents the response content message
+*/
+message ResponseContent {
+    //One of the available types.
+    oneof stream_response_content {
+        //Placeholder for any other types. Not returned unless stated
+        string rawContent= 1;
+        //For Service Type = TRANSCRIPTION
+        StreamingRecognitionResult  recognitionResult = 2 ;
+        //For Service Type = AGENT_ANSWERS
+        AgentAnswer agentAnswerResult = 3;
+    }
+}
+

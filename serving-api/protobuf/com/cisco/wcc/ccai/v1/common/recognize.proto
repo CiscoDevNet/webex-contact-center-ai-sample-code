@@ -1,0 +1,247 @@
+/*
+ This proto file has all the messages required for
+ STT Service and its recognize gRPC calls
+*/
+syntax = "proto3";
+
+package com.cisco.wcc.ccai.v1;
+
+
+
+/*
+ A streaming speech recognition result corresponding to a portion of the audio
+ that is currently being processed.
+*/
+message StreamingRecognitionResult {
+  /*
+    Output only. May contain one or more recognition hypotheses (up to the
+    maximum specified in `max_alternatives`).
+    These alternatives are ordered in terms of accuracy, with the top (first)
+    alternative being the most probable, as ranked by the recognizer.
+  */
+  repeated SpeechRecognitionAlternative alternatives = 1;
+
+  /* Output only. If `false`, this `StreamingRecognitionResult` represents an
+    interim result that may change. If `true`, this is the final time the
+    speech service will return this particular `StreamingRecognitionResult`,
+    the recognizer will not return any further hypotheses for this portion of
+    the transcript and corresponding audio.
+  */
+  bool is_final = 2;
+
+  /*
+    Output only. Time offset of the end of this result relative to the
+    beginning of the audio.
+  */
+  Duration result_end_time = 4;
+
+  /*
+    For multi-channel audio, this is the channel number corresponding to the
+    recognized result for the audio from that channel.
+    For audio_channel_count = N, its output values can range from '1' to 'N'.
+  */
+  int32 channel_tag = 5;
+
+  /*
+    Output only. The
+    [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of the
+    language in this result. This language code was detected to have the most
+    likelihood of being spoken in the audio.
+  */
+  string language_code = 6;
+
+  /*
+   Whether or not recording offsets have been applied to the word
+   alignment values. Otherwise the word alignment start and end times
+   are only relative within the utterance.
+  */
+  bool has_applied_recording_offsets = 7;
+
+  /*
+    Zero or more integers representing the speaker ID of this
+    result. This is usually derived from the speaker integers
+    that are passed in the streaming request.
+  */
+  repeated uint32 speaker_ids = 8;
+
+  /*
+    The unix time in milliseconds which was received from the client
+    for the StreamingRecognizeRequest that was last used to complete
+    this utterance.
+  */
+  int64 last_packet_metrics_unix_timestamp_ms = 9;
+
+  string message_type = 10; //message type
+
+  // Event Based on user utterances.
+  OutputEvent response_event = 11;
+}
+
+/*
+ Represents the Alternative hypotheses (a.k.a. n-best list).
+*/
+message SpeechRecognitionAlternative {
+  // Output only. Transcript text representing the words that the user spoke.
+  string transcript = 1;
+
+  /*
+    Output only. The confidence estimate between 0.0 and 1.0. A higher number
+    indicates an estimated greater likelihood that the recognized words are
+    correct. This field is set only for the top alternative of a non-streaming
+    result or, of a streaming result where `is_final=true`.
+    Not yet supported.
+  */
+  float confidence = 2;
+
+  /*
+    Output only. A list of word-specific information for each recognized word.
+    Note: When `enable_speaker_diarization` is true, you will see all the words
+    from the beginning of the audio.
+  */
+  repeated WordInfo words = 3;
+}
+
+/*
+ Represents the Word-specific information for recognized words.
+*/
+message WordInfo {
+   /*
+    Output only. Time offset relative to the beginning of the audio,
+    and corresponding to the start of the spoken word.
+    This field is only set if `enable_word_time_offsets=true` and only
+    in the top hypothesis.
+    This is an experimental feature and the accuracy of the time offset can
+    vary.
+   */
+  Duration start_time = 1;
+
+   /*
+    Output only. Time offset relative to the beginning of the audio,
+    and corresponding to the end of the spoken word.
+    This field is only set if `enable_word_time_offsets=true` and only
+    in the top hypothesis.
+    This is an experimental feature and the accuracy of the time offset can
+    vary.
+   */
+  Duration end_time = 2;
+
+  // Output only. The word corresponding to this set of information.
+  string word = 3;
+}
+
+/*
+ Represents the Duration object denoting seconds and nanos
+*/
+message Duration {
+  /*
+    Signed seconds of the span of time. Must be from -315,576,000,000
+    to +315,576,000,000 inclusive. Note: these bounds are computed from:
+    60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years
+  */
+  int64 seconds = 1;
+
+  /*
+    Signed fractions of a second at nanosecond resolution of the span
+    of time. Durations less than one second are represented with a 0
+    `seconds` field and a positive or negative `nanos` field. For durations
+    of one second or more, a non-zero value for the `nanos` field must be
+    of the same sign as the `seconds` field. Must be from -999,999,999
+    to +999,999,999 inclusive.
+  */
+  int32 nanos = 2;
+}
+
+/*
+ Represents the Status object with status code, message and description
+*/
+message Status {
+  /*
+    The status code, which should be an enum value of
+    [google.rpc.Code][google.rpc.Code].
+  */
+  int32 code = 1;
+
+  /*
+    A developer-facing error message, which should be in English. Any
+    user-facing error message should be localized and sent in the
+    [google.rpc.Status.details][google.rpc.Status.details] field, or localized
+    by the client.
+  */
+  string message = 2;
+  
+  // Longer description if available.
+  string details = 3;
+}
+
+/*
+ Return the Event based on the use input.
+ Similar events will be returned for Voice / DTMF based inputs.
+*/
+enum OutputEvent {
+  EVENT_UNSPECIFIED = 0;
+  /*
+    Triggers when user utter the first utterance in Voice Input mode or First DTMF is pressed in DTMF Input mode.
+    This event to be used to BargeIn the prompt based on prompt barge-in flag.
+    The event will be sent only if the current prompt being played is bargein enabled or prompt playing is complete.
+  */
+  EVENT_START_OF_INPUT = 1;
+  // Sent when user utterance Voice / DTMF is complete.
+  EVENT_END_OF_INPUT = 2;
+}
+
+/*
+ Represents the RecognitionFlags object with boolean to enable or disable timers
+*/
+message RecognitionFlags {
+	bool stall_timers = 1; // Whether to disable recognition timers. By default, timers start when recognition begins.
+}
+
+/*
+ Represents the TimerInfo object with different stats
+*/
+message TimerInfo {
+	int32 no_input_timeout_ms = 1; // Maximum silence, in ms, allowed while waiting for user input after recognition timers are started. Default is 7000 ms. A value of -1 means no timeout.
+	int32 complete_timeout_ms = 2; // Specify the duration of silence, in ms, after a valid recognition has occurred that determines the caller has finished speaking. Default is 0 (timer disabled).
+	int32 incomplete_timeout_ms = 3; // Specify the duration of silence, in ms, after an utterance before concluding that the caller has finished speaking. Default is 1500 ms. A value of 0 disables the timer.
+	int32 max_speech_timeout_ms = 4; // Maximum duration, in ms, of an utterance collected from the user. Default is 22000 ms (22 seconds). A value of -1 means no timeout.
+}
+
+/*
+ Represents the RecognitionResource object with attributes like grammar, language and weight
+*/
+message RecognitionResource {
+	oneof grammar {
+    BuiltInGrammar builtInGrammar = 1;                    // Name of a builtin resource supported by the installed language pack.
+    InlineGrammar inlineGrammar = 5;
+    }
+    string language = 2;                              // Mandatory. Language and country (locale) code as xx-XX (2-letters format), e.g. en-US.
+    int32 weight = 3;                               // Specifies the grammar's weight relative to other grammars active for that recognition. This value can range from 1 to 32767. Default is 1.
+    string grammar_id = 4;                            // Specifies the id that Nuance Recognizer will use to identify the grammar in the recognition result. If not set, Nuance Recognizer will generate a unique one.
+  }
+
+//BuildInGrammar enum
+enum BuiltInGrammar {
+      Boolean=0;
+      Currency=1;
+      Date=2;
+      Digits=3;
+      Number=4;
+      Phone=5;
+      Time=6;
+}
+
+/*
+ InlineGrammar object with media type and grammar information
+*/
+message InlineGrammar {
+  EnumMediaType media_type = 1;                     // The type of media used for the inline grammar data. If not specified, let Nuance Recognizer detect the media type.
+  bytes grammar = 2;                                // Grammar data
+}
+
+  //Media type enum
+  enum EnumMediaType {
+  AUTOMATIC = 0;                                    // attempt to figure out the media type automatically.
+  APPLICATION_SRGS_XML = 1;                         // "application/srgs+xml"
+  APPLICATION_X_SWI_GRAMMAR = 2;                    // "application/x-swi-grammar"
+  APPLICATION_X_SWI_PARAMETER= 3;                   // "application/x-swi-parameter"
+}

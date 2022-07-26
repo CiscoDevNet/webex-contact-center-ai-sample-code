@@ -13,7 +13,7 @@ Example: serving-api-streaming.wxcc-us1.cisco.com:443
 
 # Authentication and Authorization
 
-A valid token generated against the machine account of the org must be passed in the Authorization header and the token should carry a valid scope in it.
+A valid access token generated against the machine account of the org must be passed in the Authorization header and the token should carry a valid scope in it.
 Valid scopes : "cjp-ccai:read,cjp:organization"
 
 # Sequence Diagram

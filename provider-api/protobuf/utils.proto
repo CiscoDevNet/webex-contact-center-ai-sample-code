@@ -1,0 +1,23 @@
+/*
+ Proto file contains all the messages that can be used as utilities.
+*/
+syntax = "proto3";
+
+package com.cisco.wcc.ccai.v1;
+
+/*
+ Represents the CMS Config object to be passed to upstream services
+*/
+message CmsConfig {
+  string connector_id = 1; //connector id from cms - E.g. 6225ef12-84f9-4ef0-ba67-5e45954c2945
+  string conversation_profile_id = 2; //conversation profile id from cms - E.g. projects/ciscoss-dev-9gkv/conversationProfiles/rLyvp5sqSKCoczWEdMHiJA
+  bool default_answers = 3; // default answers enabled / disabled - boolean value
+  bool default_virtual_agent = 4; //default virtual agent enabled / disabled - boolean value
+  string description = 5; //description retrieved from cms - E.g. Google Connector\nProject Name: CiscoSS\nProfile Name: Gourav-cx\nAgent Name: Gourav
+  string id = 6; //unique identifier - E.g. 2e0ceae1-5aa4-420f-a640-39c7b36e8c70
+  string name = 7; //name of the config
+  string org_id = 8; //org id information - E.g. 1d6b8641-de43-4e8d-b88d-5b5e33e94fda
+  string type = 9; //type of the provider - E.g. Google or Nuance
+  map <string, string> config = 10; //config object - can contain multiple key value pairs
+  string product_version = 11; //product version - E.g. 2.0
+}

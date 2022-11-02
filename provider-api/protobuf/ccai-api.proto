@@ -1,12 +1,25 @@
+/*
+ This proto file has APIs for retrieving streaming content analyze responses from the the upstream
+ For the streaming analyze content requests that is sent from orchestrator, relevant streaming
+ analyze content response will be sent by the upstream connectors.
+*/
 syntax = "proto3";
 
-package com.cisco.wcc.ccai;
+package com.cisco.wcc.ccai.v1;
 
-import  "suggestions.proto";
-import  "recognize.proto";
-import  "messages.proto";
+import  "com/cisco/wcc/ccai/v1/common/suggestions.proto";
+import  "com/cisco/wcc/ccai/v1/common/recognize.proto";
+import  "com/cisco/wcc/ccai/v1/common/messages.proto";
+import  "com/cisco/wcc/ccai/v1/common/virtualagent.proto";
+import  "com/cisco/wcc/ccai/v1/common/tts.proto";
+import  "com/cisco/wcc/ccai/v1/common/utils.proto";
 
-// Role of the Stream
+/*
+ Type of the user - could be
+ human agent,
+ virtual agent or
+ end user
+*/
 enum Role {
 
   ROLE_UNSPECIFIED = 0;
@@ -15,7 +28,12 @@ enum Role {
   END_USER = 3;
 }
 
-// Audio Encoding
+/*
+ Type of the audio encoding - could be
+ linear16,
+ mulaw or
+ alaw
+*/
 enum AudioEncoding {
   // Not specified.
   ENCODING_UNSPECIFIED = 0;
@@ -23,224 +41,156 @@ enum AudioEncoding {
   LINEAR16 = 1; // TODO : Do we still need this, if not remove.
   // 8-bit samples that compound 14-bit audio samples using G.711 PCMU/mu-law.
   MULAW = 2;
+  //alaw format
+  ALAW = 3;
 }
 
-// Recognition Config
+/*
+ Represents the message for recognition config with audio encoding, sample rate hertz and language code
+*/
 message RecognitionConfig {
-  AudioEncoding encoding = 1;
-  int32 sample_rate_hertz = 2;
-  string language_code = 3;
+  AudioEncoding encoding = 1; //Type of audio encoding
+  int32 sample_rate_hertz = 2; //sample rate in hertz
+  string language_code = 3; //languate code
+
+  //Channel number which has the caller stream in a multichannel file URL. Other streams will be considered as Agent Stream.
+  //Default value will be based on RTMS usecase
+  int32 caller_channel_number = 4;
+  // Model definition to be used for recognition
+  Model model=5;
 }
 
-// A wrapper of repeated TelephonyDtmf digits.
-message DtmfEvents {
-  // A sequence of TelephonyDtmf digits.
-  repeated Dtmf dtmf_events = 1;
-}
-
-// [DTMF](https://en.wikipedia.org/wiki/Dual-tone_multi-frequency_signaling)
-// digit in Telephony Gateway.
-enum Dtmf {
-  // Not specified. This value may be used to indicate an absent digit.
-  TELEPHONY_DTMF_UNSPECIFIED = 0;
-
-  // Number: '1'.
-  DTMF_ONE = 1;
-
-  // Number: '2'.
-  DTMF_TWO = 2;
-
-  // Number: '3'.
-  DTMF_THREE = 3;
-
-  // Number: '4'.
-  DTMF_FOUR = 4;
-
-  // Number: '5'.
-  DTMF_FIVE = 5;
-
-  // Number: '6'.
-  DTMF_SIX = 6;
-
-  // Number: '7'.
-  DTMF_SEVEN = 7;
-
-  // Number: '8'.
-  DTMF_EIGHT = 8;
-
-  // Number: '9'.
-  DTMF_NINE = 9;
-
-  // Number: '0'.
-  DTMF_ZERO = 10;
-
-  // Letter: 'A'.
-  DTMF_A = 11;
-
-  // Letter: 'B'.
-  DTMF_B = 12;
-
-  // Letter: 'C'.
-  DTMF_C = 13;
-
-  // Letter: 'D'.
-  DTMF_D = 14;
-
-  // Asterisk/star: '*'.
-  DTMF_STAR = 15;
-
-  // Pound/diamond/hash/square/gate/octothorpe: '#'.
-  DTMF_POUND = 16;
-}
-
-
-// Agent Assist Request Object
-message StreamingAnalyzeAAContentRequest {
+/*
+ Represents the streamingAnalyzeContentRequest message to be sent to the connectors with config/audio/text/dtmf information
+*/
+message StreamingAnalyzeContentRequest {
+  //Input data could be audio, text, dtmf, event
   oneof InputData {
-    bytes audio = 1;
-    string text = 2;
+    bytes audio = 1; //audio
+    string text = 2; //text
+    DtmfEvents dtmf = 12; //dtmf
+    InputEvent event = 13; //event
+    //URL to stream the audio
+    string url = 17;
   }
 
-  // InputAudio Recognition Config
-  RecognitionConfig inputAudioConfig = 3;
+  RecognitionConfig inputAudioConfig = 3; // InputAudio Recognition Config
 
-  // Default = True
-  bool interim_results = 4;
-
-  // Default = False
-  bool single_utterance = 5;
-
-  //  Unique Call Identifier
-  string conversationId = 6;
-
-  // conversationId + StreamId can form the global unique Id for tracking stream
-  string roleId = 7;
-
-  // Indicates the global config id for services.
-  string ccaiConfigId = 8;
-
-  // Only Caller Role is possible here.
-  Role role = 9;
-
-  // Map to capture any additional or miscellaneous info. All provider specific config will be passed in this Map.
-  // These attributes will be configurable in the Developer tool, which can be added as supported by Provider.
-  map<string, string> additionalInfo = 10;
-
-  // OrgId for supporting OrgId based access
-  string orgId = 11;
-}
-
-// Agent Answers Response Object
-message StreamingAnalyzeAAContentResponse {
-  // Recognition result of the user utterances.
-  StreamingRecognitionResult  recognition_result = 1 ;
-
-  // Response object of Agent Answers
-  AgentAnswerResult agentAnswerResult = 2;
-
-  // All other Misc info about message
-  Message message = 3;
-}
-
-// Features to be offered on the Virtual Agent Request
-message VAFeatures {
-
-  // Whether to enable sentiment ananlysis on Audio
-  bool enableSentiments = 1;
-
-  // Other features like Voice Biometric Authentication, Translation, Language Identification etc to be added here.
-}
+  bool interim_results = 4; //Is the interim results required?
+  bool single_utterance = 5; //Is this a single utterance?
 
 
-// Virtual Agent Request Object
-message StreamingAnalyzeVAContentRequest {
+  string conversationId = 6;  //Unique conversationId. Callguid will be used as conversationId
 
-  // Input Data here can be Audio / text or DTMF
-  oneof InputData {
-    bytes audio = 1;
-    string text = 2;
-    DtmfEvents dtmf = 3;
+  string roleId = 7; //CALLGUID + StreamId can form the global unique Id for tracking stream
+
+  string ccaiConfigId = 8; //Indicates the global config id for services.
+
+  Role role = 9; //Role specifying the type of user
+
+  map<string, string> additionalInfo = 10; //Map to capture any additional or miscellaneous info
+
+  string orgId = 11 ; //OrgId for supporting OrgId based access
+
+  OutputAudioConfig outputAudioConfig = 14; //Output audio config
+
+  enum RequestType {
+    DEFAULT_UNSPECIFIED = 0; // Default Value
+    VIRTUAL_AGENT = 1;      // Virtual Agent Request
+    AGENT_ASSIST = 2;       // Agent Assist Request
   }
 
-  // InputAudio Recognition Config
-  RecognitionConfig inputAudioConfig = 4;
+  RequestType requestType = 15; //Type of the request indicating the call stage at which the API is called.
 
-  // Default = False for Virtual Assistant
-  bool interim_results = 5;
+  CmsConfig cmsConfig = 16; // passing cms config object to upstream services
 
-  // Default = True
-  bool single_utterance = 6;
-
-  //  Unique Call Identifier
-  string conversationId = 7;
-
-  // conversationId + StreamId can form the global unique Id for tracking stream
-  string roleId = 8;
-
-  // Indicates the global config id for services.
-  string ccaiConfigId = 9;
-
-  // Only Caller Role is possible here.
-  Role role = 10;
-
-  // Map to capture any additional or miscellaneous info. All provider specific config will be passed in this Map.
-  // These attributes will be configurable in the Developer tool, which can be added as supported by Provider.
-  map<string, string> additionalInfo = 11;
-
-  // OrgId for supporting OrgId based access
-  string orgId = 12;
-
-  // All the Features which needs to be offered in the responses.
-  VAFeatures features = 13;
+  // start timestamp for the url based transcripts, epoch time in millis
+  int64 urlTimestamp = 18;
 }
 
-// Virtual Agent Message Object
-// Contents TBD
-message VAMessage {
-  // Text text = 1;
-  //  google.protobuf.Struct payload = 2;
-  //  Struct live_agent_handoff = 1;
-  //  bool end_interaction = 2;
-  // string audio_uri = 3;
+/*
+ Represents the Output audio config object
+*/
+message OutputAudioConfig {
+  AudioConfig config = 1; //audio config
 }
 
-message VirtualAgentReply {
-  // Provider specific message object, in the form of JSON.
+/*
+ Represents the StreamingAnalyzeContentResponse object that is received from connector
+*/
+message StreamingAnalyzeContentResponse {
+  StreamingRecognitionResult  recognition_result = 1 ; //Recognition result corresponding to a portion of the audio that is being processed
+  AgentAnswerResult agentAnswerResult = 2; //Agent answer information for the audio being processed
+  Message message = 3; //Message object with various attributes including timestamp and sentiment analysis
+  string reply_text = 4 [deprecated = true]; //Reply text
+  bytes reply_audio = 5 [deprecated = true]; //Reply audio, use VirtualAgentResult.Prompt.audio_content instead
+  string reply_payload = 6 [deprecated = true]; //Reply payload
+  VirtualAgentResult va_result = 7; //Response of Virtual Agent
 }
 
-// Virtual Agent Response Object
-message StreamingAnalyzeVAContentResponse {
-  // Recognition result of the user utterances.
-  StreamingRecognitionResult  recognition_result = 1;
-
-  // Response object of VirtualAgent. Contains provider specific Payload.
-  VirtualAgentReply va_result = 2;
-
-  // All other Misc info about message
-  Message message = 3;
-
-  // Text returned by Virtual Agent to be played to caller
-  string reply_text = 4;
-
-  // Audio returned by Virtual Agent to be played to caller
-  bytes reply_audio = 5;
-
-  // Virtual Agent Message Object. Returns the dialog specfic generic response.
-  VAMessage va_message = 6;
-
-  // Intent identfied from the user utterance
-  string intent = 7;
-
+/*
+ Request message for the answer feedback
+*/
+message AnswerFeedbackRequest{
+  AnswerRecord answer_record = 1; //Answer record for which the feedback to be obtained
+  string ccaiConfigId = 2; //config id
+  string orgId = 3 ; //OrgId for supporting OrgId based access
 }
 
+/*
+ Returns only operation status for update operation.
+*/
+message AnswerFeedbackResponse {
+  OperationStatus status = 1; //Status denoting unknown/success/failure
+}
+
+/*
+ Represents the Answer record message with name and feedback information
+*/
+message AnswerRecord {
+  string name = 1;    //Unique Answer record name
+  AnswerFeedback answer_feedback = 2; //Answer feedback
+}
+
+/*
+ Represents the Types of status to be included in the answer feedback response
+*/
+enum OperationStatus {
+  UNKNOWN = 0; //type unknown
+  SUCCESS = 1; //type success
+  FAILURE = 2; //type failure
+}
+
+/*
+ Type of the correctness level to be included in answers feedback
+*/
+enum CorrectnessLevel {
+  CORRECTNESS_LEVEL_UNSPECIFIED = 0; //level unspecified
+  NOT_CORRECT= 1; //not correct
+  PARTIALLY_CORRECT = 2; //partially correct
+  FULLY_CORRECT = 3; //fully correct
+}
+
+/*
+ Represents the Answer Feedback message
+*/
+message AnswerFeedback {
+  // Field to set the correctness level for answer record
+  CorrectnessLevel correctness_level = 1;
+  // to capture whether answer record is clicked or not
+  bool clicked = 2;
+  // to capture whether answer record displayed or not
+  bool displayed = 3;
+}
+
+
+/*
+ Analyze content service between orchestrator and connectors
+*/
 service AnalyzeContentService {
+  //Bi-Directional Streaming API for streaming the audio content to connectors
+  rpc StreamingAnalyzeContent(stream StreamingAnalyzeContentRequest) returns (stream StreamingAnalyzeContentResponse) {}
 
-  // Bi-Directional Streaming API for Agent Assist
-  rpc StreamingAnalyzeAAContent(stream StreamingAnalyzeAAContentRequest) returns (stream StreamingAnalyzeAAContentResponse) {}
-
-
-  //Bi-Directional Streaming API for Virtual Agent
-  rpc StreamingAnalyzeVAContent(stream StreamingAnalyzeVAContentRequest) returns (stream StreamingAnalyzeVAContentResponse) {}
-
+  // Set Feedback API
+  rpc AnswerFeedback(AnswerFeedbackRequest) returns (AnswerFeedbackResponse) {}
 }
-

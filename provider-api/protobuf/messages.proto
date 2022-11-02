@@ -1,56 +1,36 @@
+/**
+* This proto file contains messages with attributes
+* related to timestamp and sentiment analysis
+*/
 syntax = "proto3";
 
-package com.cisco.wcc.ccai;
+package com.cisco.wcc.ccai.v1;
 
-enum NullValue{
-  NULL = 0;
-}
-message Struct{
-  map<string, Value> fields=1;
-}
-message ListValue{
-  Value value = 1;
-}
-message Value{
-  oneof value_oneof {
-    NullValue null_value = 1;
-    double number_value = 2;
-    string string_value = 3;
-    bool bool_value = 4;
-    Struct struct_value = 5;
-    ListValue list_value = 6;
-
-  }
-}
-
-message  AnnotatedMessagePart {
-  string text = 1;
-  string entity_type = 2;
-  Value formatted_value = 3;
-}
-
-message  MessageAnnotation {
-  repeated  AnnotatedMessagePart parts = 1;
-  bool contain_entities = 2;
-}
-
+/*
+ Represents the Timestamp object which denotes seconds and nanos
+*/
 message Timestamp{
-  int64 seconds = 1;
-  int32  nanos = 2;
+  int64 seconds = 1; //seconds
+  int32  nanos = 2; //nanos
 }
 
+/*
+ Represents the SentimentAnalysis object with score and magnitude
+*/
 message SentimentAnalysis {
-  float score = 1;
-  float magnitude = 2;
+  float score = 1; //score
+  float magnitude = 2; //magnitude
 }
 
+/*
+ Represents the Message object with various attributes including timestamp and sentiment analysis
+*/
 message Message {
-  string name = 1;
-  string content = 2;
-  string languageCode = 3 ;
-  string participant = 4 ;
-  string participantRole = 5;
-  Timestamp create_time = 6 ;
-  MessageAnnotation message_annotation = 7;
-  SentimentAnalysis sentiment_analysis = 8;
+  string name = 1; //Name
+  string content = 2; //Content
+  string languageCode = 3 ; //Language Code
+  string participant = 4 ; //Participant
+  string participantRole = 5; //Participant Role
+  Timestamp create_time = 6 ; //Creation timestamp
+  SentimentAnalysis sentiment_analysis = 8; //Sentiment Analysis
 }

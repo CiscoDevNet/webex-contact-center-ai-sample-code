@@ -1,4 +1,4 @@
-Note: The Provider APIs are not open for anyone to use. This is only for selected partners. For any request for integration please reach out to Cisco on [ccai-connectors@cisco.com](mailto:ccai-connectors@cisco.com) with business use case.
+**Note:** *The Provider APIs are not open for anyone to use. This is only for selected partners. For any request for integration please reach out to Cisco on [ccai-connectors@cisco.com](mailto:ccai-connectors@cisco.com) with business use case.*
 
 # Architecture
 

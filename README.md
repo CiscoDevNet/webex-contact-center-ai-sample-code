@@ -9,5 +9,4 @@ CCAI APIs can be leveraged for Agent Answers to enable Agents assist the custome
 ## Serving API
 To be used by Webex CCAI Serving Clients for Call Insights.
 ## Provider API
-To be used by Providers integrating with CCAI Platform to offer AI Services. 
-Note: These APIs are not open for anyone to use. This is only for selected partners. For any request for integration please reach out to Cisco on [ccai-connectors@cisco.com](mailto:ccai-connectors@cisco.com) with business use case.
+To be used by Providers integrating with CCAI Platform to offer AI Services.

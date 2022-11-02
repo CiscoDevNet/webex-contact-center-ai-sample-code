@@ -1,4 +1,4 @@
-**Note:** *The Provider APIs are not open for anyone to use. This is only for selected partners. For any request for integration please reach out to Cisco on [ccai-connectors@cisco.com](mailto:ccai-connectors@cisco.com) with business use case.*
+**Note:** *These APIs are not open for public consumption, currently these are in Beta under trial with selected partners. For any new request to use these APIs please reach out to Cisco on [ccai-connectors@cisco.com](mailto:ccai-connectors@cisco.com) with business use case.*
 
 # Architecture
 
@@ -32,9 +32,6 @@ For detailed description of the API, please refer the protobuf files.
 Request: The requests will be passed with the generic params defined in the protobuf and Provider specific params will be set in the Map contained in the request in the form of Key / Value.
 Response: The response will need to populate the generic params defined in the protobuf in the specific params and Provider specific objects will be passed back to client in the form of object json.
 Features: The request will also carry the desired features needed on the incoming request. The response object should return the responses accordingly.
-# Billing
-1.	API Gateway to perform the Metering and Billing for the CCAI Platform on per Webex CI tenant basis.
-2.	Providers can perform Billing based on the onboarding auth key offered which will be different for each CCAI Config.
 # Authentication
 Provider to provide a mechanism to create a tenant specific auth key / token. Which will be onboarded during Onboarding. This key/token will be offered by Orchestrator to External Connector for Authentication, it will also be used by External Connector to identify the tenant and billing.
 TBD: Design for the Auth Server in Provider.

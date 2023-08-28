@@ -250,6 +250,10 @@ enum BuiltInGrammar {
   Number=4;
   Phone=5;
   Time=6;
+  Alphanum=7;
+  Amount=8;
+  Ordinal_number=9;
+  Cardinal_number=10;
 }
 
 /*

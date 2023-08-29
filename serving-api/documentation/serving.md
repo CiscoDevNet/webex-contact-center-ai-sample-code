@@ -4,8 +4,11 @@
 ## Table of Contents
 
 - [serving.proto](#serving-proto)
+    - [AgentDetails](#com-cisco-wcc-ccai-v1-AgentDetails)
     - [InsightServingRequest](#com-cisco-wcc-ccai-v1-InsightServingRequest)
     - [InsightServingResponse](#com-cisco-wcc-ccai-v1-InsightServingResponse)
+    - [InsightsServingRequest](#com-cisco-wcc-ccai-v1-InsightsServingRequest)
+    - [InsightsServingResponse](#com-cisco-wcc-ccai-v1-InsightsServingResponse)
     - [ResponseContent](#com-cisco-wcc-ccai-v1-ResponseContent)
     - [StreamingInsightServingRequest](#com-cisco-wcc-ccai-v1-StreamingInsightServingRequest)
     - [StreamingInsightServingResponse](#com-cisco-wcc-ccai-v1-StreamingInsightServingResponse)
@@ -13,6 +16,8 @@
     - [InsightServingResponse.Role](#com-cisco-wcc-ccai-v1-InsightServingResponse-Role)
     - [InsightServingResponse.ServiceProvider](#com-cisco-wcc-ccai-v1-InsightServingResponse-ServiceProvider)
     - [InsightServingResponse.ServiceType](#com-cisco-wcc-ccai-v1-InsightServingResponse-ServiceType)
+    - [InsightsServingRequest.InsightType](#com-cisco-wcc-ccai-v1-InsightsServingRequest-InsightType)
+    - [InsightsServingResponse.ServiceProvider](#com-cisco-wcc-ccai-v1-InsightsServingResponse-ServiceProvider)
   
     - [AiInsight](#com-cisco-wcc-ccai-v1-AiInsight)
   
@@ -26,6 +31,21 @@
 ## serving.proto
 This proto file contains the Serving API
 Service streaming gRPC calls for retrieving the streaming insights based on the conversation id
+
+
+<a name="com-cisco-wcc-ccai-v1-AgentDetails"></a>
+
+### AgentDetails
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| agentId | [string](#string) |  |  |
+
+
+
+
 
 
 <a name="com-cisco-wcc-ccai-v1-InsightServingRequest"></a>
@@ -42,6 +62,11 @@ Represents the request content for retrieving AI Insights
 | historicalTranscripts | [bool](#bool) |  | Is historical transcripts from start of the conversation required? Default: false |
 | realtimeAgentAssist | [bool](#bool) |  | Is real time agent assist required? Default: False |
 | historicalAgentAssist | [bool](#bool) |  | Is historical agent assist from start of the conversation required? Default: false |
+| realTimeMessage | [bool](#bool) |  | Is real time messages required? Default: false |
+| historicalMessage | [bool](#bool) |  | Is historical messages from start of the conversation required? Default: false |
+| historicalVirtualAgent | [bool](#bool) |  | Is virtual agent from start of the conversation required? Default: false |
+| agentDetails | [AgentDetails](#com-cisco-wcc-ccai-v1-AgentDetails) |  | Required. AgentDetails from where the call is initiated. |
+| messageId | [string](#string) |  | Sets the message id for the request , this uniquely identifies each request . |
 
 
 
@@ -51,7 +76,7 @@ Represents the request content for retrieving AI Insights
 <a name="com-cisco-wcc-ccai-v1-InsightServingResponse"></a>
 
 ### InsightServingResponse
-Represents the insight serving response
+
 
 
 | Field | Type | Label | Description |
@@ -64,11 +89,54 @@ Represents the insight serving response
 | insightType | [InsightServingResponse.ServiceType](#com-cisco-wcc-ccai-v1-InsightServingResponse-ServiceType) |  | Type of insight : ASR, Agent Assist etc. |
 | insightProvider | [InsightServingResponse.ServiceProvider](#com-cisco-wcc-ccai-v1-InsightServingResponse-ServiceProvider) |  | Service Provider who produced this insight. |
 | publishTimestamp | [int64](#int64) |  | Epoch Timestamp when this insight record was created/published. This field is always available, can be used for sorting messages by time. |
-| startTimestamp | [int64](#int64) |  | Start time corresponds to the start time to which this insight belongs. Epoch Timestamp. These are optional fields, not always available |
-| endTimestamp | [int64](#int64) |  | End time corresponds to the speech end time to which this insight belongs. Epoch Timestamp. These are optional fields, not always available |
+| startTimestamp | [int64](#int64) |  | Start time and end time corresponds to the speech interval to which this insight belongs. Epoch Timestamp. These are optional fields, not always available |
+| endTimestamp | [int64](#int64) |  |  |
 | isFinal | [bool](#bool) |  | Whether the insight is final or intermediate. Intermediate results will be overridden by the final result that follows them. |
-| responseContent | [ResponseContent](#com-cisco-wcc-ccai-v1-ResponseContent) |  | Content of the insight. This will vary based on the type of insight |
 | messageId | [string](#string) |  | message id |
+| configId | [string](#string) |  |  |
+| languageCode | [string](#string) |  |  |
+| responseContent | [ResponseContent](#com-cisco-wcc-ccai-v1-ResponseContent) |  | Content of the insight. This will vary based on the type of insight |
+
+
+
+
+
+
+<a name="com-cisco-wcc-ccai-v1-InsightsServingRequest"></a>
+
+### InsightsServingRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| conversationId | [string](#string) |  | Required. Conversation ID (in combination with the messageId, if provided)for which insights are needed. The subscription will start listening to any insights for this conversation (along with messageId if provided) across multiple legs( IVR, Caller, Agent) and services (Transcription, Agent Assist) |
+| messageId | [string](#string) |  | Optional. if messageId is provided then the insights are fetched with the combination of conversationId. The subscription will start listening to any insights for this messageID along with the conversationId field across multiple legs( IVR, Caller, Agent) and services (Transcription, Agent Assist) |
+| orgId | [string](#string) |  | Required.Control Hub OrgID for the org, this conversation belongs to. The Access token should have authorization for this Org. |
+| insightType | [InsightsServingRequest.InsightType](#com-cisco-wcc-ccai-v1-InsightsServingRequest-InsightType) |  |  |
+
+
+
+
+
+
+<a name="com-cisco-wcc-ccai-v1-InsightsServingResponse"></a>
+
+### InsightsServingResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| conversationId | [string](#string) |  | Required. Conversation ID (in combination with the messageId, if provided)for which insights are needed. The subscription will start listening to any insights for this conversation (along with messageId if provided) across multiple legs( IVR, Caller, Agent) and services (Transcription, Agent Assist) |
+| messageId | [string](#string) |  | Optional. if messageId is provided then the insights are fetched with the combination of conversationId. The subscription will start listening to any insights for this messageID along with the conversationId field across multiple legs( IVR, Caller, Agent) and services (Transcription, Agent Assist) |
+| orgId | [string](#string) |  | Required.Control Hub OrgID for the org, this conversation belongs to. The Access token should have authorization for this Org. |
+| startTimestamp | [int64](#int64) |  | Start time and end time corresponds to the speech interval to which this insight belongs. Epoch Timestamp. These are optional fields, not always available |
+| endTimestamp | [int64](#int64) |  |  |
+| configId | [string](#string) |  |  |
+| languageCode | [string](#string) |  |  |
+| insightProvider | [InsightsServingResponse.ServiceProvider](#com-cisco-wcc-ccai-v1-InsightsServingResponse-ServiceProvider) |  | Service Provider who produced this insight. |
+| responseContent | [ResponseContent](#com-cisco-wcc-ccai-v1-ResponseContent) | repeated | Content of the insight. This will vary based on the type of insight |
 
 
 
@@ -86,6 +154,8 @@ Represents the response content message
 | rawContent | [string](#string) |  | Placeholder for any other types. Not returned unless stated |
 | recognitionResult | [StreamingRecognitionResult](#com-cisco-wcc-ccai-v1-StreamingRecognitionResult) |  | For Service Type = TRANSCRIPTION |
 | agentAnswerResult | [AgentAnswer](#com-cisco-wcc-ccai-v1-AgentAnswer) |  | For Service Type = AGENT_ANSWERS |
+| messageResult | [Message](#com-cisco-wcc-ccai-v1-Message) |  | For Service Type = MESSAGE |
+| virtualAgentResult | [NLU](#com-cisco-wcc-ccai-v1-NLU) |  | For Service Type = VIRTUAL_AGENT |
 
 
 
@@ -100,7 +170,7 @@ Represents the request for retrieving insights for a given conversation ID
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| insightServingRequest | [InsightServingRequest](#com-cisco-wcc-ccai-v1-InsightServingRequest) |  | Insight serving request |
+| insightServingRequest | [InsightServingRequest](#com-cisco-wcc-ccai-v1-InsightServingRequest) |  |  |
 
 
 
@@ -116,7 +186,7 @@ Each service type may have zero or more messages
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| insightServingResponse | [InsightServingResponse](#com-cisco-wcc-ccai-v1-InsightServingResponse) |  | Insight serving response |
+| insightServingResponse | [InsightServingResponse](#com-cisco-wcc-ccai-v1-InsightServingResponse) |  |  |
 
 
 
@@ -132,9 +202,9 @@ Identifier for the party.
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| IVR | 0 | Role - IVR |
-| CALLER | 1 | Role - Caller |
-| AGENT | 2 | Role - Agent |
+| IVR | 0 |  |
+| CALLER | 1 |  |
+| AGENT | 2 |  |
 
 
 
@@ -145,8 +215,10 @@ Provider List for Services
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| DEFAULT | 0 | Service provider - Default |
-| GOOGLE | 1 | Service provider - Google |
+| DEFAULT | 0 |  |
+| CISCO | 1 |  |
+| GOOGLE | 2 |  |
+| NUANCE | 3 |  |
 
 
 
@@ -157,9 +229,40 @@ Type of service this Insight belongs to
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| DEFAULT_TRANSCRIPTION | 0 | Service type - Default |
-| AGENT_ANSWERS | 1 | Service type - Agent answers |
-| TRANSCRIPTION | 2 | Service type - Transcription |
+| DEFAULT_TRANSCRIPTION | 0 |  |
+| AGENT_ANSWERS | 1 |  |
+| TRANSCRIPTION | 2 |  |
+| VIRTUAL_AGENT | 3 |  |
+| MESSAGE | 4 |  |
+
+
+
+<a name="com-cisco-wcc-ccai-v1-InsightsServingRequest-InsightType"></a>
+
+### InsightsServingRequest.InsightType
+Type of service this Insight request belongs to
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DEFAULT_TRANSCRIPTION | 0 |  |
+| AGENT_ANSWERS | 1 |  |
+| TRANSCRIPTION | 2 |  |
+| VIRTUAL_AGENT | 3 |  |
+| MESSAGE | 4 |  |
+
+
+
+<a name="com-cisco-wcc-ccai-v1-InsightsServingResponse-ServiceProvider"></a>
+
+### InsightsServingResponse.ServiceProvider
+Provider List for Services
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DEFAULT | 0 |  |
+| CISCO | 1 |  |
+| GOOGLE | 2 |  |
+| NUANCE | 3 |  |
 
 
  
@@ -175,6 +278,7 @@ Service to subscribe to, to get AI Insights
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | StreamingInsightServing | [StreamingInsightServingRequest](#com-cisco-wcc-ccai-v1-StreamingInsightServingRequest) | [StreamingInsightServingResponse](#com-cisco-wcc-ccai-v1-StreamingInsightServingResponse) stream | Server side Streaming gRPC Call that produces streaming insights for a given conversation ID |
+| InsightServing | [InsightsServingRequest](#com-cisco-wcc-ccai-v1-InsightsServingRequest) | [InsightsServingResponse](#com-cisco-wcc-ccai-v1-InsightsServingResponse) |  |
 
  
 

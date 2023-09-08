@@ -7,8 +7,10 @@ option java_multiple_files = true;
 
 package com.cisco.wcc.ccai.v1;
 
+import "com/cisco/wcc/ccai/v1/common/messages.proto";
 import "com/cisco/wcc/ccai/v1/common/suggestions.proto";
 import "com/cisco/wcc/ccai/v1/common/recognize.proto";
+import "com/cisco/wcc/ccai/v1/common/virtualagent.proto";
 
 
 /*
@@ -21,14 +23,17 @@ service AiInsight {
      for a given conversation ID
     */
     rpc StreamingInsightServing(StreamingInsightServingRequest)
-    returns (stream StreamingInsightServingResponse) {}
+        returns (stream StreamingInsightServingResponse) {}
+    
+    rpc InsightServing(InsightsServingRequest)
+        returns (InsightsServingResponse) {}
 }
 
 /*
  Represents the request for retrieving insights for a given conversation ID
 */
 message StreamingInsightServingRequest{
-    InsightServingRequest insightServingRequest = 1; // Insight serving request
+    InsightServingRequest insightServingRequest = 1;
 }
 
 /*
@@ -53,7 +58,97 @@ message InsightServingRequest{
     bool historicalTranscripts = 4; // Is historical transcripts from start of the conversation required? Default: false
     bool realtimeAgentAssist = 5; // Is real time agent assist required? Default: False
     bool historicalAgentAssist = 6; // Is historical agent assist from start of the conversation required? Default: false
+    bool realTimeMessage = 7; // Is real time messages required? Default: false
+    bool historicalMessage = 8; // Is historical messages from start of the conversation required? Default: false
+    bool historicalVirtualAgent = 9; // Is virtual agent from start of the conversation required? Default: false
 
+    /*
+      Required. AgentDetails from where the call is initiated.
+  */
+    AgentDetails agentDetails  = 11;
+
+    string messageId = 12; //Sets the message id for the request , this uniquely identifies each request .
+}
+
+message InsightsServingRequest{
+    /*
+      Required. Conversation ID (in combination with the messageId, if provided)for which insights are needed.
+      The subscription will start listening to any insights for this conversation (along with messageId if provided)
+      across multiple legs( IVR, Caller, Agent) and services (Transcription, Agent Assist)
+  */
+    string conversationId = 1;
+
+    /*
+      Optional. if messageId is provided then the insights are fetched with the combination of conversationId.
+      The subscription will start listening to any insights for this messageID along with the conversationId field
+      across multiple legs( IVR, Caller, Agent) and services (Transcription, Agent Assist)
+    */
+    string messageId=2;
+
+    /*
+        Required.Control Hub OrgID for the org, this conversation belongs to.
+        The Access token should have authorization for this Org.
+    */
+    string orgId = 3;
+
+    // Type of service this Insight request belongs to
+    enum InsightType {
+        DEFAULT_TRANSCRIPTION =  0;
+        AGENT_ANSWERS       =   1;
+        TRANSCRIPTION         =   2;
+        VIRTUAL_AGENT = 3;
+        MESSAGE = 4;
+    }
+
+    InsightType insightType = 4;
+}
+
+message InsightsServingResponse{
+    /*
+      Required. Conversation ID (in combination with the messageId, if provided)for which insights are needed.
+      The subscription will start listening to any insights for this conversation (along with messageId if provided)
+      across multiple legs( IVR, Caller, Agent) and services (Transcription, Agent Assist)
+  */
+    string conversationId = 1;
+
+    /*
+      Optional. if messageId is provided then the insights are fetched with the combination of conversationId.
+      The subscription will start listening to any insights for this messageID along with the conversationId field
+      across multiple legs( IVR, Caller, Agent) and services (Transcription, Agent Assist)
+    */
+    string messageId=2;
+
+    /*
+        Required.Control Hub OrgID for the org, this conversation belongs to.
+        The Access token should have authorization for this Org.
+    */
+    string orgId = 3;
+
+
+    /*
+      Start time and end time corresponds to the speech interval
+      to which this insight belongs. Epoch Timestamp.
+      These are optional fields, not always available
+     */
+    int64 startTimestamp = 4;
+    int64 endTimestamp = 5;
+
+    string configId = 6;
+    string languageCode = 7;
+
+    // Provider List for Services
+    enum ServiceProvider {
+        DEFAULT         =  0;
+        CISCO            =   1;
+        GOOGLE            =  2;
+        NUANCE            = 3;
+    }
+
+    //Service Provider who produced this insight.
+    ServiceProvider insightProvider = 8;
+
+    //Content of the insight. This will vary based on the type of insight
+    repeated ResponseContent responseContent = 9;
 }
 
 /*
@@ -61,13 +156,17 @@ message InsightServingRequest{
  Each service type may have zero or more messages
 */
 message StreamingInsightServingResponse{
-    InsightServingResponse insightServingResponse = 1; // Insight serving response
+    InsightServingResponse insightServingResponse = 1;
 }
 
 
+message AgentDetails{
+    string agentId = 1;
+}
 /*
  Represents the insight serving response
 */
+
 message InsightServingResponse{
 
     //Org Identifier (control hub) for which the insights need to be delivered
@@ -87,9 +186,9 @@ message InsightServingResponse{
 
     //Identifier for the party.
     enum Role {
-        IVR=0; // Role - IVR
-        CALLER=1; // Role - Caller
-        AGENT=2; // Role - Agent
+        IVR=0;
+        CALLER=1;
+        AGENT=2;
     }
 
     //Role specifying IVR, Caller or Agent
@@ -97,9 +196,11 @@ message InsightServingResponse{
 
     // Type of service this Insight belongs to
     enum ServiceType {
-        DEFAULT_TRANSCRIPTION =  0; // Service type - Default
-        AGENT_ANSWERS       =   1; // Service type - Agent answers
-        TRANSCRIPTION         =   2; // Service type - Transcription
+        DEFAULT_TRANSCRIPTION =  0;
+        AGENT_ANSWERS       =   1;
+        TRANSCRIPTION         =   2;
+        VIRTUAL_AGENT = 3;
+        MESSAGE = 4;
     }
 
     // Type of insight : ASR, Agent Assist etc.
@@ -107,8 +208,10 @@ message InsightServingResponse{
 
     // Provider List for Services
     enum ServiceProvider {
-        DEFAULT         =  0; // Service provider - Default
-        GOOGLE          =  1; // Service provider - Google
+        DEFAULT         =  0;
+        CISCO            =   1;
+        GOOGLE            =  2;
+        NUANCE            = 3;
     }
 
     //Service Provider who produced this insight.
@@ -121,17 +224,11 @@ message InsightServingResponse{
     int64 publishTimestamp = 8;
 
     /*
-     Start time corresponds to the start time
+     Start time and end time corresponds to the speech interval
      to which this insight belongs. Epoch Timestamp.
      These are optional fields, not always available
     */
     int64 startTimestamp = 9;
-
-    /*
-     End time corresponds to the speech end time
-     to which this insight belongs. Epoch Timestamp.
-     These are optional fields, not always available
-    */
     int64 endTimestamp = 10;
 
     /*
@@ -140,11 +237,13 @@ message InsightServingResponse{
     */
     bool isFinal = 11;
 
-    //Content of the insight. This will vary based on the type of insight
-    ResponseContent responseContent = 12;
-
     //message id
     string messageId=13;
+    string configId = 14;
+    string languageCode = 15;
+
+    //Content of the insight. This will vary based on the type of insight
+    ResponseContent responseContent = 12;
 }
 
 /*
@@ -159,6 +258,9 @@ message ResponseContent {
         StreamingRecognitionResult  recognitionResult = 2 ;
         //For Service Type = AGENT_ANSWERS
         AgentAnswer agentAnswerResult = 3;
+        //For Service Type = MESSAGE
+        Message messageResult = 4;
+        // For Service Type = VIRTUAL_AGENT
+        NLU virtualAgentResult  = 5;
     }
 }
-

@@ -20,4 +20,15 @@ message CmsConfig {
   string type = 9; //type of the provider - E.g. Google or Nuance
   map <string, string> config = 10; //config object - can contain multiple key value pairs
   string product_version = 11; //product version - E.g. 2.0
+  bool system_default = 12;
+}
+
+/*
+ Describes the consumer information like home region details
+*/
+message ConsumerInfo {
+
+  // Represents WxCC Home Cluster Id the Call Belongs to
+  string wxcc_cluster_id = 1;
+
 }

@@ -6,6 +6,7 @@ syntax = "proto3";
 package com.cisco.wcc.ccai.v1;
 
 import "google/protobuf/struct.proto";
+import "com/cisco/wcc/ccai/v1/common/recognize.proto";
 
 /*
  A wrapper of repeated TelephonyDtmf digits.
@@ -81,6 +82,8 @@ message InputEvent {
     CALL_START = 1;
     CALL_END = 2;
     CUSTOM = 3;
+    NO_INPUT = 4; //No input event in case of no input received from caller.
+    START_OF_DTMF = 5; //event to indicate start of dtmf input.
   }
 
   EventType event_type = 1;           // Event Type
@@ -98,6 +101,20 @@ message VirtualAgentResult {
   InputMode input_mode = 4;           // Input Mode for the next input
   bool is_secure = 5;                 // secure flag from provider to indicate sensitive input
   ExecuteRequest execute_request = 6 [deprecated=true]; // Request to execute the routing at client side by breaking the callflow.
+  ResponseType response_type = 7;     // VA response type from provider (Partial/Final)
+  enum ResponseType {
+    RESPONSE_FINAL = 0;               // No more response expected
+    RESPONSE_PARTIAL = 1;             // Expect more response from server
+  }
+  InputConfigInfer input_config_infer = 8; // Input config for the clients to handle timeouts and buffering of DTMF user inputs
+}
+
+/*
+ Input config for the client.
+  */
+message InputConfigInfer {
+  DTMFConfig dtmf_config = 1; // DTMF Input Configurations
+  SpeechTimers speech_timers = 2; // Represents the TimerInfo object
 }
 
 /*
@@ -172,7 +189,7 @@ message Prompt {
   string audio_uri    = 2;            // Response in the form of a Audio URL. Client Need to play the locally. Optional
   bytes audio_content = 3;            // Response in the form of Audio Content. In case of Chunked audio this will repeat. Optional
   bool bargein = 4;                   // Whether the current prompt is barge-in enabled. Optional, Default: false
-  bool final = 5;                     // Whether the current chunk is last chunk. Optional, Default: false
+  bool final = 5;                    // Whether the current chunk is last chunk. Optional, Default: false
 }
 
 /*

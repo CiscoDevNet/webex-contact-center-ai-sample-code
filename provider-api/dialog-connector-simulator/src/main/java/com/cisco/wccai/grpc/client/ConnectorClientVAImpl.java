@@ -10,6 +10,8 @@ import com.cisco.wccai.grpc.observer.StopObserver;
 import com.cisco.wccai.grpc.utils.Utils;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Struct;
+import com.google.protobuf.Value;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +48,13 @@ public class ConnectorClientVAImpl {
     public ClientStreamResponseObserver executeCallStart(String sessionId, CcaiApi.RecognitionConfig recognitionConfig, final CountDownLatch countDownLatch) {
         ClientStreamResponseObserver clientStreamResponseObserver = new ClientStreamResponseObserver(countDownLatch);
         StreamObserver<CcaiApi.StreamingAnalyzeContentRequest> streamingAnalyzeContentRequestStreamObserver = stub.streamingAnalyzeContent(clientStreamResponseObserver);
-        Virtualagent.InputEvent inputEvent = Virtualagent.InputEvent.newBuilder().setEventType(Virtualagent.InputEvent.EventType.CALL_START).build();
+        Virtualagent.InputEvent inputEvent = Virtualagent.InputEvent.newBuilder().setEventType(Virtualagent.InputEvent.EventType.CALL_START)
+                .setName("Custom_Event").setParameters(Struct.newBuilder()
+                        .putFields("name", Value.newBuilder()
+                                .setStringValue("John")
+                                .build())
+                        .build())
+                .build();
         CcaiApi.StreamingAnalyzeContentRequest streamingAnalyzeContentRequest = CcaiApi.StreamingAnalyzeContentRequest.newBuilder()
                 .setOutputAudioConfig(CcaiApi.OutputAudioConfig.newBuilder().setConfig(Tts.AudioConfig.newBuilder().setAudioEncoding(Tts.OutputAudioEncoding.OUTPUT_MULAW)
                         .setVoice(Tts.SpeakerParams.newBuilder().setName(NATHAN).build()).build())).setEvent(inputEvent).setInterimResults(true).setSingleUtterance(true).

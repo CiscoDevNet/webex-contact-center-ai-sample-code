@@ -9,21 +9,21 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <grpc.version>1.46.0</grpc.version>
-        <protobuf.version>3.20.1</protobuf.version>
-        <compileSource>11</compileSource>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <grpc.version>1.62.2</grpc.version>
+        <protobuf.version>3.25.3</protobuf.version>
+        <compileSource>17</compileSource>
         <jetty.alpn.agent.version>2.0.10</jetty.alpn.agent.version>
         <junit.jupiter.version>5.6.0</junit.jupiter.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.cisco.wccai</groupId>
-            <artifactId>dialog-connector</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.cisco.wccai</groupId>-->
+<!--            <artifactId>dialog-connector</artifactId>-->
+<!--            <version>5.0.0</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>com.google.protobuf</groupId>
@@ -102,13 +102,13 @@
         <dependency>
             <groupId>com.cisco.wccai</groupId>
             <artifactId>dialog-connector-simulator</artifactId>
-            <version>1.0.0</version>
+            <version>5.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.32</version>
             <scope>compile</scope>
         </dependency>
 
@@ -133,12 +133,12 @@
                         <id>install-external-dialog-connector-jar</id>
                         <phase>clean</phase>
                         <configuration>
-                            <file>${project.basedir}/src/lib/dialog-connector-1.0.0.jar</file>
+                            <file>${project.basedir}/src/lib/dialog-connector-5.0.0.jar</file>
                             <repositoryLayout>default</repositoryLayout>
                             <packaging>jar</packaging>
                             <groupId>com.cisco.wccai</groupId>
                             <artifactId>dialog-connector-simulator</artifactId>
-                            <version>1.0.0</version>
+                            <version>5.0.0</version>
                         </configuration>
                         <goals>
                             <goal>install-file</goal>

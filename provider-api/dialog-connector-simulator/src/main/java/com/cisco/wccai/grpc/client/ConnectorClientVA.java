@@ -86,7 +86,7 @@ public class ConnectorClientVA {
                 }
             }
 
-            //STOP REQUEST
+//            //STOP REQUEST
             CountDownLatch countDownLatchStop = new CountDownLatch(1);
             StopObserver stopObserver =  client.stop(convId,recognitionConfig, countDownLatchStop);
             countDownLatchStop.await();

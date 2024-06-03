@@ -112,6 +112,9 @@ message StreamingAnalyzeContentRequest {
 
   ConsumerInfo consumerInfo=20; //Any additional client information can be passed using this object
 
+  //field to hold the virtual agent id in the request
+  string virtualAgentId = 21;
+
 }
 
 /*
@@ -189,6 +192,23 @@ message AnswerFeedback {
   bool displayed = 3;
 }
 
+message ListVirtualAgentsRequest {
+
+  //Org Identifier (control hub) for which the insights need to be delivered
+  string orgId = 1;
+
+  /* cms config for connector */
+  CmsConfig cms_config = 2;
+
+}
+
+message ListVirtualAgentsResponse{
+
+  //Indicates the list of bots for the selected provider
+  repeated VirtualAgent virtual_agents = 1;
+
+}
+
 /*
  Analyze content service between orchestrator and connectors
 */
@@ -198,4 +218,9 @@ service AnalyzeContentService {
 
   // Set Feedback API
   rpc AnswerFeedback(AnswerFeedbackRequest) returns (AnswerFeedbackResponse) {}
+
+  /*
+     The Service that takes config and org id and returns a list of bots for the specific provider
+   */
+  rpc ListVirtualAgents(ListVirtualAgentsRequest) returns (ListVirtualAgentsResponse) {}
 }

@@ -39,6 +39,7 @@ public class VAResponse {
         if (request.hasEvent()) {
             switch (request.getEvent().getEventType().toString()) {
                 case CALL_START:
+                    LOGGER.info("received CUSTOM INPUT event for conversationId : {} ", request.getEvent());
                     LOGGER.info("received CALL_START event for conversationId : {} ", request.getConversationId());
                     break;
                 case CALL_END:

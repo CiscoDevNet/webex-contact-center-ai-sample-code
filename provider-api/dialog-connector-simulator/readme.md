@@ -29,6 +29,7 @@ WxCC VA Client Application which is a **gRPC Client Application**.
 - Audio Sampling Rate: _**16kHz/8KHz**_
 - Language: _**en-US**_
 - Encoding Format: _**Linear16/ulaw**_
+- Please note, we only support wav or raw audio files, 8/16kHz bit rate, single channel
 
 ### List Bot API for Dialog Connector Simulator
 Each Provider endpoint to implement API to return a list of configured bots to be used in Flowbuilder to decide th bot to be used
@@ -36,15 +37,13 @@ during the call flow with the Customer. The API should return the list of bots c
 Refer ListVirtualAgents API in the ccai-api.proto file.
 
 ### Serviceability
-Each Provider endpoint to expose certain APIs to monitor the health of endpoint.
-https://<Service endpoint>/<service Name>/v1/ping
-Please note, we only support wav or raw audio files, 8/16kHz bit rate, single channel
+Each Provider endpoint to expose certain APIs to monitor the health of endpoint. The APIs should return the status of the service
 
 ## Dialog Connector Application Development
 
 ### Step 1. Start of Conversation
 1. Dialog Connector  will start up as gRPC Server Application.
-2. WxCC Virtual Agent(VA) Client Application will start up as gRPC client and open a gRPC connection with the above Server Application
+2. WxCC Virtual Agent(VA) Client Application will start up as gRPC client and open a secure gRPC connection with the above Server Application
 3. When a caller calls, the Client application signals to Dialog Connector to start the conversation 
 by creating a new conversation (conversation_id) and sending a StreamingAnalyzeContentRequest to the Server Application with EventType:CALL_START.
 The conversation_id is used for the entire conversation between the Caller(WxCC Virtual Agent Client Application) and Virtual Agent(Server Application).
@@ -83,7 +82,7 @@ Prompts contain the Audio which needs to be played to caller. It can return one 
 ### Overall flow of the Agent Assist mode
 Agent Assist Services leverages the AI services and helps agent handle the customer in more effective way.
 
-![AA-flow](./src/main/resources/images/AA-flow.png)
+![AA-flow](./src/main/resources/images/AA-flow1.png)
 
 # Glossary
   * **Prompts**: The API response will provide the barge-in status of the prompts to be played. Each prompt will indicate if its barge-in enabled / disabled.

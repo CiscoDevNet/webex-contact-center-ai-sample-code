@@ -1,0 +1,37 @@
+/*
+ This proto file has the service related to healthcheck
+*/
+syntax = "proto3";
+
+package com.cisco.wcc.ccai.v1;
+
+/*
+ Represents the Input Request for health check
+*/
+message HealthCheckRequest {
+  string service = 1; //service for which health check to be done
+}
+
+/*
+ Represents the Response object with Health status
+*/
+message HealthCheckResponse {
+  //Serving status could be unknown, serving or not serving
+  enum ServingStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+  }
+  ServingStatus status = 1; //status of the service could be UNKNOWN, SERVING OR NOT_SERVING
+}
+
+/*
+ Service allocated for Health check
+*/
+service Health {
+  //Unary RPC call for verifying the health of a service
+  rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
+
+  //Server streaming RPC call for monitoring the health of a service for certain duration
+  rpc Watch(HealthCheckRequest) returns (stream HealthCheckResponse);
+}

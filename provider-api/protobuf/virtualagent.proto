@@ -199,3 +199,18 @@ message ExecuteRequest {
   string event_name = 1;              // Name of the event to be used to return back to the callflow.
   string event_data = 2;              // Custom data to be used by the client to execute the request.
 }
+
+message VirtualAgent {
+
+  //Indicates the bots unique identifier
+  string virtualAgentId = 1;
+
+  //Indicates the bot name
+  string virtualAgentName = 2;
+
+  //Indicates whether the respective bot is a default bot for the selected provider
+  bool isDefault = 3;
+
+  // Any additional attributes that are required
+  map<string, string> additionalAttributes = 4;
+}

@@ -15,6 +15,7 @@ public class VAResponse {
     private static final Logger LOGGER = LoggerFactory.getLogger(VAResponse.class);
     public static final String CALL_START = "CALL_START";
     public static final String CALL_END = "CALL_END";
+    public static final String CUSTOM = "CUSTOM";
     private boolean isFirstTimeDTMF = Boolean.TRUE;
     private boolean isTermCharacter = Boolean.TRUE;
 
@@ -39,16 +40,18 @@ public class VAResponse {
         if (request.hasEvent()) {
             switch (request.getEvent().getEventType().toString()) {
                 case CALL_START:
-                    LOGGER.info("received CUSTOM INPUT event for conversationId : {} ", request.getEvent());
                     LOGGER.info("received CALL_START event for conversationId : {} ", request.getConversationId());
                     break;
                 case CALL_END:
                     LOGGER.info("received CALL_END event for conversationId : {} ", request.getConversationId());
                     responseObserver.onNext(Context.getResponse(State.CALL_END).getCallEndResponse());
                     break;
+                case CUSTOM:
+                    LOGGER.info("received CUSTOM event for conversationId : {} ", request.getConversationId());
+                    break;
                 default:
                     result = Virtualagent.VirtualAgentResult.newBuilder().setResponsePayload("UNSPECIFIED EVENT RECEIVED").build();
-                    responseObserver.onNext(CcaiApi.StreamingAnalyzeContentResponse.newBuilder().setVaResult(result).build());
+                    responseObserver.onNext(Context.getResponse(State.VA).getFinalVAResponse());
                     break;
 
             }

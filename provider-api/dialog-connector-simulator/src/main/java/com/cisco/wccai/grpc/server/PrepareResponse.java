@@ -186,13 +186,10 @@ public class PrepareResponse {
                         .setAudioContent(ByteString.readFrom(Utils.getInputStreamForBookAFlight()))
                         .setBargein(Boolean.TRUE)
                         .build())
-//                .setNlu(Virtualagent.NLU.newBuilder()
-//                        .setIntent(Virtualagent.Intent.newBuilder()
-//                                .setMatchConfidence(0.32f)
-//                                .build()))
                 .setNlu(Virtualagent.NLU.newBuilder()
-                        .setExitEvent(Virtualagent.ExitEvent.newBuilder().setEventType(Virtualagent.ExitEvent.EventType.AGENT_TRANSFER).build())
-                        .build())
+                        .setIntent(Virtualagent.Intent.newBuilder()
+                                .setMatchConfidence(0.32f)
+                                .build()))
                 .setInputMode(Virtualagent.InputMode.INPUT_VOICE)
                 .build();
 

@@ -19,12 +19,6 @@
     </properties>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.cisco.wccai</groupId>-->
-<!--            <artifactId>dialog-connector</artifactId>-->
-<!--            <version>5.0.0</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>

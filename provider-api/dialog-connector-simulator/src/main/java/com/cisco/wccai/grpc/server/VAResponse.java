@@ -51,7 +51,7 @@ public class VAResponse {
                     break;
                 default:
                     result = Virtualagent.VirtualAgentResult.newBuilder().setResponsePayload("UNSPECIFIED EVENT RECEIVED").build();
-                    responseObserver.onNext(Context.getResponse(State.VA).getFinalVAResponse());
+                    responseObserver.onNext(CcaiApi.StreamingAnalyzeContentResponse.newBuilder().setVaResult(result).build());
                     break;
 
             }

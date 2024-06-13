@@ -13,7 +13,24 @@ The Dialog Connector Simulator emulates a dialog connector, enabling end-to-end 
 
 These connectors provide comprehensive dialog services.
 
-Onboarding is required to use the Dialog Connector Simulator. The Webex Contact Center Control Hub is used to create a configuration. The configuration includes the provider endpoint, services, and authentication token. The configuration is represented by a configId and defines the services and features to be used. The Orchestrator orchestrates the call to a specific provider and adds the necessary feature flags based on the configuration details.
+## Onboarding Steps for Using the Dialog Connector Simulator
+
+To use the Dialog Connector Simulator, follow these onboarding steps:
+
+1. **Integration Setup**:
+    - Use the Webex Contact Center Control Hub to create an integration https://admin.webex.com/wxcc/integrations
+    - In the Connector Tab, set up the provider's Connector credentials.
+
+2. **AI Configuration**:
+    - In the Features Tab, create a Contact Center AI Configuration. This configuration is represented by a `configId` and defines the credentials and features to be used.
+
+3. **Flow Creation**:
+    - Create a flow with the Virtual Agent Voice Activity and use the above created AI Configuration in the Flow Control UI.
+
+4. **EntryPoint Mapping**:
+    - Map the EntryPoint to the newly created flow (EntryPoint -> Routing Strategy -> Flow).
+
+After these steps, the Webex Contact Center (WxCC) will orchestrate the call to a specific provider based on the configuration details.
 
 ##  Dialog Connector Code Overview
 This sample code offers an overview of the various methods and messages used when the Dialog Connector interacts with
@@ -44,15 +61,29 @@ Refer to the ListVirtualAgents API in the ccai-api.proto file.
 Each Provider endpoint should expose certain APIs to monitor the health of the endpoint. The APIs should return the status of the service.
 
 ## Dialog Connector Application Development
+### Development Environment Commands
+1. Install Java 17.
+Verify the Installation by opening a new terminal and run:
 
-### Step 1. Start of Conversation
-1. The Dialog Connector will start up as a **gRPC Server Application**.
-2. The WxCC Virtual Agent (VA) Client Application will start up as a **gRPC Client** and open a secure gRPC connection with the Server Application.
+    `java -version`
+2. Compile Protobuf Definitions: This will generate java classes under target/generated-sources/protobuf/grpc-java and target/generated-sources/protobuf/java.
+    
+    `cd webex-contact-center-ai-sample-code/provider-api/dialog-connector-simulator`
+
+    `mvn clean compile`.
+3. Build the Main Application:
+
+   `mvn clean install`
+
+### Detailed Flow with Sequence Diagram
+#### Step 1. Start of Conversation
+1. The Dialog Connector will start up as a **gRPC Server Application** (`run GrpcServer.java`).
+2. The WxCC Virtual Agent (VA) Client Application will start up as a **gRPC Client**(`run ConnectorClientVA.java`) and open a secure gRPC connection with the Server Application.
 3. When a caller calls, the Client Application signals to the Dialog Connector to start the conversation by creating a new conversation (`conversation_id`) and sending a `StreamingAnalyzeContentRequest` to the Server Application with `EventType: CALL_START`. The `conversation_id` is used for the entire conversation between the Caller (WxCC VA Client Application) and Virtual Agent (Server Application). The request is sent without any audio data.
 4. `EventType: CALL_START` can be used by the connector to start the session with its AI Service and return a response back to the Client using `StreamingAnalyzeContentResponse`. It could contain response payloads, prompts, NLU data, and input mode for handling the next interactions from the Caller. Prompts contain the audio which needs to be played to the Caller. It can return one or multiple prompts in a response. Prompts are played one after another at the client side in the sequence of receiving.
 
 ![VA-flow](./src/main/resources/images/VADialogConnectorSimulatorStep1.jpg)
-### Step 2. Continue the Conversation Between the Caller and Virtual Agent
+#### Step 2. Continue the Conversation Between the Caller and Virtual Agent
 1. The Client Application, on receiving the prompt, plays it to the Caller and invokes the next dialog based on the input mode received in the response.
 2. **Input Mode** indicates the type of input expected from the Caller. It can be `dtmf` only, `voice` only, or `dtmf_and_voice` both.
     - If the input mode is `dtmf`, the Client Application will wait for the DTMF input from the Caller.
@@ -64,7 +95,7 @@ Each Provider endpoint should expose certain APIs to monitor the health of the e
 
    ![VA-flow](./src/main/resources/images/VADialogConnectorSimulatorStep2.jpg)
 
-### Step 3. Stop the Conversation
+#### Step 3. Stop the Conversation
 1. When the conversation ends between the Caller and Virtual Agent, the Caller can disconnect the call.
     - The Client Application sends a `StreamingAnalyzeContentRequest` to the Server Application with `EventType: CALL_END`.
     - `EventType: CALL_END` can be used by the Server Application to close the session with its AI Service and return a response back to the Client using `StreamingAnalyzeContentResponse`.

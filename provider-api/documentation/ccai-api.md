@@ -8,6 +8,8 @@
     - [AnswerFeedbackRequest](#com-cisco-wcc-ccai-v1-AnswerFeedbackRequest)
     - [AnswerFeedbackResponse](#com-cisco-wcc-ccai-v1-AnswerFeedbackResponse)
     - [AnswerRecord](#com-cisco-wcc-ccai-v1-AnswerRecord)
+    - [ListVirtualAgentsRequest](#com-cisco-wcc-ccai-v1-ListVirtualAgentsRequest)
+    - [ListVirtualAgentsResponse](#com-cisco-wcc-ccai-v1-ListVirtualAgentsResponse)
     - [OutputAudioConfig](#com-cisco-wcc-ccai-v1-OutputAudioConfig)
     - [RecognitionConfig](#com-cisco-wcc-ccai-v1-RecognitionConfig)
     - [StreamingAnalyzeContentRequest](#com-cisco-wcc-ccai-v1-StreamingAnalyzeContentRequest)
@@ -100,6 +102,37 @@ Represents the Answer record message with name and feedback information
 
 
 
+<a name="com-cisco-wcc-ccai-v1-ListVirtualAgentsRequest"></a>
+
+### ListVirtualAgentsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| orgId | [string](#string) |  | Org Identifier (control hub) for which the insights need to be delivered |
+| cms_config | [CmsConfig](#com-cisco-wcc-ccai-v1-CmsConfig) |  | cms config for connector |
+
+
+
+
+
+
+<a name="com-cisco-wcc-ccai-v1-ListVirtualAgentsResponse"></a>
+
+### ListVirtualAgentsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| virtual_agents | [VirtualAgent](#com-cisco-wcc-ccai-v1-VirtualAgent) | repeated | Inidcates the list of bots for the selected provider |
+
+
+
+
+
+
 <a name="com-cisco-wcc-ccai-v1-OutputAudioConfig"></a>
 
 ### OutputAudioConfig
@@ -162,6 +195,7 @@ Represents the streamingAnalyzeContentRequest message to be sent to the connecto
 | urlTimestamp | [int64](#int64) |  | start timestamp for the url based transcripts, epoch time in millis |
 | enablePartialResponse | [bool](#bool) |  | Flag to enable partial response for VA |
 | consumerInfo | [ConsumerInfo](#com-cisco-wcc-ccai-v1-ConsumerInfo) |  | Any additional client information can be passed using this object |
+| virtualAgentId | [string](#string) |  | field to hold the virtual agent id in the request |
 
 
 
@@ -296,6 +330,7 @@ Analyze content service between orchestrator and connectors
 | ----------- | ------------ | ------------- | ------------|
 | StreamingAnalyzeContent | [StreamingAnalyzeContentRequest](#com-cisco-wcc-ccai-v1-StreamingAnalyzeContentRequest) stream | [StreamingAnalyzeContentResponse](#com-cisco-wcc-ccai-v1-StreamingAnalyzeContentResponse) stream | Bi-Directional Streaming API for streaming the audio content to connectors |
 | AnswerFeedback | [AnswerFeedbackRequest](#com-cisco-wcc-ccai-v1-AnswerFeedbackRequest) | [AnswerFeedbackResponse](#com-cisco-wcc-ccai-v1-AnswerFeedbackResponse) | Set Feedback API |
+| ListVirtualAgents | [ListVirtualAgentsRequest](#com-cisco-wcc-ccai-v1-ListVirtualAgentsRequest) | [ListVirtualAgentsResponse](#com-cisco-wcc-ccai-v1-ListVirtualAgentsResponse) | The Service that takes config and org id and returns a list of bots for the specific provider |
 
  
 

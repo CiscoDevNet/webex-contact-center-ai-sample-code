@@ -10,6 +10,8 @@ import com.cisco.wccai.grpc.observer.StopObserver;
 import com.cisco.wccai.grpc.utils.Utils;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Struct;
+import com.google.protobuf.Value;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

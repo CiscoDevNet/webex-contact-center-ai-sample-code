@@ -31,4 +31,7 @@ message ConsumerInfo {
   // Represents WxCC Home Cluster Id the Call Belongs to
   string wxcc_cluster_id = 1;
 
+  //Client to pass its identification, this will be used to provide client specific functionalities by Connectors. e.g. "CCE-VVB-12.6", "WCC-RMS" etc.
+  string user_agent = 2;
+
 }

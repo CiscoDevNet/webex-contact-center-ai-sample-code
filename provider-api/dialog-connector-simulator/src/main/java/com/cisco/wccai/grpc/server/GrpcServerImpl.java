@@ -20,7 +20,12 @@ public class GrpcServerImpl extends AnalyzeContentServiceGrpc.AnalyzeContentServ
         return new StreamingAnalyzeContentObserver(responseObserver);
     }
 
+    @Override
+    public void listVirtualAgents(CcaiApi.ListVirtualAgentsRequest request, StreamObserver<CcaiApi.ListVirtualAgentsResponse> responseObserver) {
+        LOGGER.info("RPC request received for listing virtual agents");
+        new ListVirtualAgentsObserver().processAPICall(request, responseObserver);
 
+    }
 }
 
 

@@ -18,7 +18,7 @@ public class Utils {
     public static byte[] getAudioBytes() {
         byte[] audioBytes;
         if (LINEAR_16.equalsIgnoreCase(AUDIO_ENCODING_TYPE)) {
-            audioBytes = new byte[16 * BUFFER_SIZE];
+            audioBytes = new byte[2 * BUFFER_SIZE];
         } else {
             audioBytes = new byte[BUFFER_SIZE];
         }
